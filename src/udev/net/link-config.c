@@ -292,17 +292,22 @@ static int get_mac(sd_device *device, MACAddressPolicy policy, struct ether_addr
         int r;
 
         assert(IN_SET(policy, MAC_ADDRESS_POLICY_RANDOM, MAC_ADDRESS_POLICY_PERSISTENT));
+        log_info("FOO #4");
 
         r = link_unsigned_attribute(device, "addr_assign_type", &addr_type);
         if (r < 0)
                 return r;
         switch (addr_type) {
         case NET_ADDR_SET:
+                log_info("FOO #5");
                 return log_device_debug(device, "MAC on the device already set by userspace");
         case NET_ADDR_STOLEN:
+                log_info("FOO #6");
                 return log_device_debug(device, "MAC on the device already set based on another device");
         case NET_ADDR_RANDOM:
+                log_info("FOO #7");
         case NET_ADDR_PERM:
+                log_info("FOO #8");
                 break;
         default:
                 return log_device_warning(device, "Unknown addr_assign_type %u, ignoring", addr_type);
@@ -453,9 +458,13 @@ int link_config_apply(link_config_ctx *ctx, link_config *config,
                 log_device_debug(device, "Policies didn't yield a name and Name= is not given, not renaming.");
  no_rename:
 
+        log_info("FOO #1");
         if (IN_SET(config->mac_address_policy, MAC_ADDRESS_POLICY_PERSISTENT, MAC_ADDRESS_POLICY_RANDOM)) {
-                if (get_mac(device, config->mac_address_policy, &generated_mac) > 0)
+                if (get_mac(device, config->mac_address_policy, &generated_mac) > 0) {
+                        log_info("FOO #2");
                         mac = &generated_mac;
+                }
+                log_info("FOO #3");
         } else
                 mac = config->mac;
 
